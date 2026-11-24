@@ -29,6 +29,7 @@ export default {
     const url = new URL(request.url);
     const kv = env.VIPER_KV;
     const path = url.pathname;
+    const redirectUri = `${url.origin}/auth/callback`;
 
     if (path === '/login' && request.method === 'GET') {
       return new Response(LOGIN_HTML, { headers: { 'content-type': 'text/html; charset=utf-8' } });
@@ -88,7 +89,7 @@ export default {
       const authUrl = new URL('https://openapi.baidu.com/oauth/2.0/authorize');
       authUrl.searchParams.set('response_type', 'code');
       authUrl.searchParams.set('client_id', env.BAIDU_CLIENT_ID);
-      authUrl.searchParams.set('redirect_uri', env.BAIDU_REDIRECT_URI);
+      authUrl.searchParams.set('redirect_uri', redirectUri);
       authUrl.searchParams.set('scope', 'basic,netdisk');
       authUrl.searchParams.set('qrcode', '1');
       authUrl.searchParams.set('state', state);
@@ -105,7 +106,7 @@ export default {
       tokenUrl.searchParams.set('code', code);
       tokenUrl.searchParams.set('client_id', env.BAIDU_CLIENT_ID);
       tokenUrl.searchParams.set('client_secret', env.BAIDU_CLIENT_SECRET);
-      tokenUrl.searchParams.set('redirect_uri', env.BAIDU_REDIRECT_URI);
+      tokenUrl.searchParams.set('redirect_uri', redirectUri);
       const r = await fetch(tokenUrl.toString());
       const data = await r.json();
       if (!data.refresh_token) return json(data, 400);

@@ -18,7 +18,6 @@ const env = {
   SIGN_SECRET: 'sign-secret',
   BAIDU_CLIENT_ID: 'x',
   BAIDU_CLIENT_SECRET: 'y',
-  BAIDU_REDIRECT_URI: 'https://example.com/auth/callback',
 };
 
 async function call(path, init = {}) {
@@ -57,6 +56,13 @@ test('worker: /p redeems ticket and redirects, replay blocked', async () => {
   assert.equal(r1.headers.get('location'), 'https://d.pcs.baidu.com/file');
   const r2 = await call('/p?t=' + encodeURIComponent(ticket));
   assert.equal(r2.status, 403);
+});
+
+test('worker: auth start uses dynamic redirect_uri', async () => {
+  const r = await call('/auth/start');
+  assert.equal(r.status, 302);
+  const loc = new URL(r.headers.get('location'));
+  assert.equal(loc.searchParams.get('redirect_uri'), 'https://viper.example.com/auth/callback');
 });
 
 test('worker: health', async () => {

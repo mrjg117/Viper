@@ -6,14 +6,10 @@ compatibility_date = "2026-11-24"
 binding = "VIPER_KV"
 id = "REPLACE_WITH_KV_ID"
 
-[vars]
-BAIDU_REDIRECT_URI = "https://REPLACE_WITH_WORKER_DOMAIN/auth/callback"
-
-# secrets (wrangler secret put):
-#   ADMIN_PASSWORD
-#   SIGN_SECRET
-#   BAIDU_CLIENT_ID
-#   BAIDU_CLIENT_SECRET
-
 [triggers]
 crons = ["0 3 * * *"]
+
+# CF Workers Builds: 连接 GitHub 仓库后，Deploy command 填 `npx wrangler deploy`。
+# 在 CF 控制台 Project → Settings → Secrets and variables 添加 4 个 Secret:
+#   ADMIN_PASSWORD / SIGN_SECRET / BAIDU_CLIENT_ID / BAIDU_CLIENT_SECRET
+# 回调地址由代码按请求域名自动生成，无需配置 BAIDU_REDIRECT_URI。
