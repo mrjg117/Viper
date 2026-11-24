@@ -21,17 +21,32 @@ NDM 请求 /p ── 验票 ── 302 到真实 dlink
 - 签名票：`v1.<payload>.<HMAC-SHA256>`，含目标 ID、过期时间、随机 nonce；nonce 用后即焚，防重放。
 - 未登录：打不开 `/gen`；票泄露：15 分钟失效 + 一次性。
 
-## 部署
+## 部署（GitHub 集成）
+
+仓库已配好 `.github/workflows/deploy.yml`：push `main` 先跑测试，再部署到 Workers。一次性准备：
 
 ```bash
-npm test                       # 本地跑 14 个测试，只测鉴权，不打网络
-npx wrangler kv namespace create VIPER_KV   # 把 id 填进 wrangler.toml
-wrangler secret put ADMIN_PASSWORD
-wrangler secret put SIGN_SECRET
-wrangler secret put BAIDU_CLIENT_ID
-wrangler secret put BAIDU_CLIENT_SECRET
-npx wrangler deploy
+# 1. 建 KV，记下输出的 id
+npx wrangler kv namespace create VIPER_KV
 ```
+
+在 GitHub 仓库 Settings → Secrets and variables → Actions 添加：
+
+| Secret | 说明 |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | Workers Scripts 编辑 + Account:Read 权限 |
+| `CLOUDFLARE_ACCOUNT_ID` | CF 账户 ID |
+| `VIPER_KV_ID` | 上一步 KV namespace id |
+| `VIPER_DOMAIN` | Worker 域名，如 `viper.xxx.workers.dev` |
+| `ADMIN_PASSWORD` | 登录密码 |
+| `SIGN_SECRET` | 签名密钥，随机长字符串 |
+| `BAIDU_CLIENT_ID` | 百度开放平台 AppKey |
+| `BAIDU_CLIENT_SECRET` | 百度开放平台 SecretKey |
+
+`BAIDU_REDIRECT_URI` 由 `VIPER_DOMAIN` 自动拼成 `https://<domain>/auth/callback`。
+之后 push 即自动部署；也可在 Actions 页手动 `workflow_dispatch` 触发。
+
+本地部署（不依赖 GitHub）：填好 `wrangler.toml` 的 KV id 和域名，`wrangler secret put` 上述 4 个密钥，再 `npx wrangler deploy`。
 
 首次使用：访问 `/auth/start` 扫码授权百度账号，token 存 KV，Cron 每天自动刷新。
 
