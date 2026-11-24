@@ -1,0 +1,19 @@
+name = "viper"
+main = "src/index.js"
+compatibility_date = "2026-11-24"
+
+[[kv_namespaces]]
+binding = "VIPER_KV"
+id = "REPLACE_WITH_KV_ID"
+
+[vars]
+BAIDU_REDIRECT_URI = "https://REPLACE_WITH_WORKER_DOMAIN/auth/callback"
+
+# secrets (wrangler secret put):
+#   ADMIN_PASSWORD
+#   SIGN_SECRET
+#   BAIDU_CLIENT_ID
+#   BAIDU_CLIENT_SECRET
+
+[triggers]
+crons = ["0 3 * * *"]
